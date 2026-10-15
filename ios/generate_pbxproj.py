@@ -68,7 +68,7 @@ pbx += f'''/* End PBXBuildFile section */
 
 for e in file_entries:
     ft = 'sourcecode.swift' if e['name'].endswith('.swift') else ('text.plist.xml' if e['name'].endswith('.plist') else 'folder.assetcatalog')
-    pbx += f'''\t\t{e['f_id']} /* {e['name']} */ = {{isa = PBXFileReference; lastKnownFileType = {ft}; path = \"{e['name']}\"; sourceTree = \"<group>\"; }};\n'''
+    pbx += f'''\t\t{e['f_id']} /* {e['name']} */ = {{isa = PBXFileReference; lastKnownFileType = {ft}; name = \"{e['name']}\"; path = \"{e['rel_path']}\"; sourceTree = \"<group>\"; }};\n'''
 
 pbx += f'''/* End PBXFileReference section */
 
