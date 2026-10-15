@@ -1,36 +1,27 @@
 package com.photovance.app.ui.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+import coil.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.photovance.app.R
-import com.photovance.app.ui.theme.*
 
 data class StylePreset(
     val id: String,
@@ -46,60 +37,60 @@ data class StylePreset(
 val VISUAL_STYLE_PRESETS = listOf(
     StylePreset(
         id = "monaco_yacht",
-        title = "Monaco Yacht",
-        subtitle = "Gold Chainmail",
-        prompt = "wearing a glamorous backless gold chainmail dress, standing on the teak deck of a luxury superyacht in Monaco during golden hour sunset, cinematic lighting, 8k photo",
-        drawableRes = R.drawable.style_monaco_yacht,
+        title = "Studio Knit",
+        subtitle = "Soft ivory",
+        prompt = "wearing a soft ivory knitted dress in a minimal charcoal studio, natural portrait lighting, refined editorial photography",
+        drawableRes = R.drawable.cc0_studio,
         badge = "🔥 Trending",
-        category = "Luxury Glamour",
+        category = "Casual",
         mode = "face_studio"
     ),
     StylePreset(
         id = "cannes_gala",
-        title = "Cannes Gala",
-        subtitle = "Emerald Velvet",
-        prompt = "haute couture emerald green velvet backless evening gown, diamond necklace, at a prestigious Cannes red carpet film premiere, paparazzi flashlights, ultra detailed 8k",
-        drawableRes = R.drawable.style_cannes_gala,
+        title = "Evening Edit",
+        subtitle = "Burgundy satin",
+        prompt = "wearing a burgundy satin evening dress with draped sleeves and delicate gold earrings, softly blurred outdoor background, elegant editorial portrait",
+        drawableRes = R.drawable.cc0_evening,
         badge = "👑 VIP",
         category = "Red Carpet",
         mode = "face_studio"
     ),
     StylePreset(
         id = "maldives_beach",
-        title = "Maldives Beach",
-        subtitle = "Tropical Bikini",
-        prompt = "sun-drenched vacation portrait wearing a stylish red triangle bikini, standing on pristine white sand turquoise tropical beach in the Maldives, wet hair, golden sunlight",
-        drawableRes = R.drawable.style_maldives_beach,
+        title = "Summer Colour",
+        subtitle = "Soft coral print",
+        prompt = "wearing a flowing coral and turquoise printed summer dress with sunglasses, warm daylight, relaxed summer street portrait",
+        drawableRes = R.drawable.cc0_summer,
         badge = "✨ Popular",
         category = "Vacation",
         mode = "face_studio"
     ),
     StylePreset(
         id = "tokyo_street",
-        title = "Tokyo Moto",
-        subtitle = "Black Leather",
-        prompt = "chic edgy street style wearing a black leather moto biker jacket and dark denim jeans, leaning against a luxury sports car on a neon Tokyo street at night",
-        drawableRes = R.drawable.style_tokyo_street,
+        title = "City Muse",
+        subtitle = "Champagne layers",
+        prompt = "wearing champagne layers with a light longline coat and a shimmering skirt, modern pale stone architecture, polished city street style",
+        drawableRes = R.drawable.cc0_city,
         badge = "⚡ Edgy",
         category = "Street Style",
         mode = "face_studio"
     ),
     StylePreset(
         id = "opera_crimson",
-        title = "Opera House",
-        subtitle = "Crimson Silk",
-        prompt = "breathtaking dramatic portrait wearing an opulent crimson red silk ballgown with flowing train, standing on the grand staircase of the Sydney Opera House at twilight",
-        drawableRes = R.drawable.style_opera_crimson,
+        title = "Crimson Edit",
+        subtitle = "Flowing red",
+        prompt = "wearing a flowing crimson red gown beside a quiet garden pond, soft natural daylight, graceful full-length editorial photography",
+        drawableRes = R.drawable.cc0_crimson,
         badge = "💎 Haute Couture",
         category = "Red Carpet",
         mode = "face_studio"
     ),
     StylePreset(
         id = "floral_sundress",
-        title = "Floral Sundress",
-        subtitle = "Summer Rose",
-        prompt = "vibrant summer floral sundress with natural drape and delicate ruffles, standing in a sunlit blooming botanical garden, warm soft film glow",
-        drawableRes = R.drawable.style_floral_sundress,
+        title = "Forest Light",
+        subtitle = "Ivory lace",
+        prompt = "wearing an ivory lace dress in a shaded woodland garden, dappled warm sunlight, soft natural editorial photography",
+        drawableRes = R.drawable.cc0_garden,
         badge = "🌸 Fresh",
         category = "Casual",
         mode = "in_place"
@@ -113,107 +104,25 @@ fun StyleInspirationCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.05f else 1.0f,
-        animationSpec = tween(durationMillis = 200),
-        label = "styleCardScale"
-    )
-
-    Box(
-        modifier = modifier
-            .width(138.dp)
-            .height(188.dp)
-            .scale(scale)
-            .clip(RoundedCornerShape(18.dp))
-            .border(
-                width = if (isSelected) 2.5.dp else 1.dp,
-                brush = if (isSelected) NeonGlowGradient else SolidColor(Color(0x2EFFFFFF)),
-                shape = RoundedCornerShape(18.dp)
-            )
-            .background(BgCard)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
-    ) {
-        // Thumbnail Image
-        Image(
-            painter = painterResource(id = preset.drawableRes),
-            contentDescription = preset.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        // Gradient Shadow Overlay for text readability
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(95.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color(0xCC07090E), Color(0xF507090E))
-                    )
-                )
-        )
-
-        // Top-Left Category Badge Pill
-        Box(
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.TopStart)
-                .background(Color(0xCC07090E), RoundedCornerShape(8.dp))
-                .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(8.dp))
-                .padding(horizontal = 7.dp, vertical = 3.dp)
-        ) {
-            Text(
-                text = preset.badge,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+    Box(modifier.width(148.dp).height(205.dp).clip(MaterialTheme.shapes.medium)
+        .border(if (isSelected) 2.dp else 1.dp,
+            if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+            MaterialTheme.shapes.medium)
+        .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)) {
+        AsyncImage(model = preset.drawableRes, contentDescription = null, contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize())
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(
+            listOf(Color.Transparent, Color.Transparent, Color(0xE8111014)))))
+        if (isSelected) Box(Modifier.align(Alignment.TopEnd).padding(10.dp).size(26.dp)
+            .background(MaterialTheme.colorScheme.primary, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Icons.Default.Check, "Selected", tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(17.dp))
         }
-
-        // Top-Right Checkmark when Selected
-        if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(24.dp)
-                    .align(Alignment.TopEnd)
-                    .background(HeroGradient, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
-                    tint = Color.White,
-                    modifier = Modifier.size(15.dp)
-                )
-            }
-        }
-
-        // Bottom Typography (Title & Subtitle)
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(horizontal = 10.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = preset.title,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextMain,
-                maxLines = 1
-            )
-            Text(
-                text = preset.subtitle,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                color = TextMuted,
-                maxLines = 1
-            )
+        Column(Modifier.align(Alignment.BottomStart).padding(12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(preset.title, style = MaterialTheme.typography.labelLarge, color = Color.White,
+                maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(preset.subtitle, style = MaterialTheme.typography.labelSmall, color = Color(0xFFE2DCE9),
+                maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
     }
 }

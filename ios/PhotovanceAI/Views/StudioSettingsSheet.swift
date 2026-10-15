@@ -12,10 +12,10 @@ struct StudioSettingsSheet: View {
     @State private var alertMessage: String? = nil
 
     let models = [
-        ("flux_klein", "🌟 Flux.2 Klein 4B Turbo (Fast · 4-step · Unrestricted)"),
-        ("flux_klein_ultra", "👑 Flux.2 Klein 4B Master (FP16 · Ultra Fabric Texture)"),
-        ("realvis_xl", "📸 RealVisXL v5.0 (SDXL Photography)"),
-        ("serenity", "👗 Serenity v2.1 (SD1.5 Photography)")
+        ("flux_klein", "Photovance Ultra-Portrait™ (8K Studio Lighting · Ultra-Sharp)"),
+        ("flux_klein_ultra", "Editorial Couture Master™ (Runway Texture · Micro-Weave Fidelity)"),
+        ("realvis_xl", "Classic 35mm Film™ (Warm Cinematic Grain · Analog Depth)"),
+        ("serenity", "Studio Glamour Soft™ (Soft Portrait Glow · Natural Lighting)")
     ]
 
     let aspectRatios = [

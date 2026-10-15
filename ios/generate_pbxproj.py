@@ -14,6 +14,10 @@ files = [
     ('BeforeAfterSliderView.swift', 'Components/BeforeAfterSliderView.swift', 'source'),
     ('HomeScreenView.swift', 'Views/HomeScreenView.swift', 'source'),
     ('StudioSettingsSheet.swift', 'Views/StudioSettingsSheet.swift', 'source'),
+    ('DeviceCapabilityDetector.swift', 'Hardware/DeviceCapabilityDetector.swift', 'source'),
+    ('KeychainVault.swift', 'Security/KeychainVault.swift', 'source'),
+    ('AuthManager.swift', 'Network/AuthManager.swift', 'source'),
+    ('AuthView.swift', 'Views/AuthView.swift', 'source'),
     ('Assets.xcassets', 'Assets.xcassets', 'resource')
 ]
 

@@ -35,8 +35,8 @@ FLUX_VAE = "flux2-vae.safetensors"
 MODELS = {
     "flux_klein": {
         "id": "flux_klein",
-        "name": "🌟 Flux.2 Klein 4B Turbo (Unrestricted Heretic DiT · Recommended)",
-        "desc": "Ultra-fast 4-step generation with ReferenceLatent. Unrestricted Heretic text encoder (zero censorship). Generates any scene, outfit, and pose with 100% face likeness.",
+        "name": "Photovance Ultra-Portrait™",
+        "desc": "Fast 8K Studio Lighting with micro-detail rendering and 100% facial identity lock.",
         "type": "flux",
         "unet": "flux-2-klein-4b-fp8.safetensors",
         "clip": "qwen3-4b-heretic_fp8_e4m3fn.safetensors",
@@ -47,8 +47,8 @@ MODELS = {
     },
     "flux_klein_ultra": {
         "id": "flux_klein_ultra",
-        "name": "👑 Flux.2 Klein 4B Master (FP16 Full Precision · Unrestricted)",
-        "desc": "Full-precision master DiT — highest fidelity fabric micro-textures, authentic silk folds, and studio lighting with 100% facial identity preservation.",
+        "name": "Editorial Couture Master™",
+        "desc": "High-fashion runway fidelity with micro-weave fabric texture and studio lighting.",
         "type": "flux",
         "unet": "flux-2-klein-4b.safetensors",
         "clip": "qwen3-4b-heretic_fp8_e4m3fn.safetensors",
@@ -57,28 +57,28 @@ MODELS = {
         "steps": 6,
         "sampler": "euler"
     },
+    "realvis_xl": {
+        "id": "realvis_xl",
+        "name": "Classic 35mm Film™",
+        "desc": "Warm cinematic grain and analog photographic depth with natural skin tones.",
+        "type": "sdxl",
+        "checkpoint": "RealVisXL_V5.0_fp16.safetensors",
+        "target_size": 896,
+        "cfg": 4.5,
+        "steps": 14,
+        "sampler": "dpmpp_2m",
+        "scheduler": "karras"
+    },
     "serenity": {
         "id": "serenity",
-        "name": "Serenity v2.1 (SD1.5 Photography · Inpainting)",
-        "desc": "Photorealistic SD1.5 portrait photography with 100% facial lock & ControlNet inpainting",
+        "name": "Studio Glamour Soft™",
+        "desc": "Gentle portrait illumination with elegant soft skin tones.",
         "type": "sd15",
         "checkpoint": "serenity_v21Safetensors.safetensors",
         "vae": SD_VAE,
         "target_size": 768,
         "cfg": 6.0,
         "steps": 16,
-        "sampler": "dpmpp_2m",
-        "scheduler": "karras"
-    },
-    "realvis_xl": {
-        "id": "realvis_xl",
-        "name": "RealVisXL v5.0 (SDXL Photography · Inpainting)",
-        "desc": "High-resolution SDXL photorealistic fashion generation with 100% facial lock & Fooocus inpainting",
-        "type": "sdxl",
-        "checkpoint": "RealVisXL_V5.0_fp16.safetensors",
-        "target_size": 896,
-        "cfg": 4.5,
-        "steps": 14,
         "sampler": "dpmpp_2m",
         "scheduler": "karras"
     }

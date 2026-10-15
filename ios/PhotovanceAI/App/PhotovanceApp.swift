@@ -2,6 +2,9 @@ import SwiftUI
 
 @main
 struct PhotovanceApp: App {
+    @ObservedObject var authManager = AuthManager.shared
+    @State private var hasEnteredStudio: Bool = false
+
     init() {
         // Initialize API client from persistent UserDefaults
         ApiClient.shared.initialize()
@@ -9,8 +12,15 @@ struct PhotovanceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeScreenView()
+            if authManager.currentUser != nil || hasEnteredStudio {
+                HomeScreenView()
+                    .preferredColorScheme(.dark)
+            } else {
+                AuthView {
+                    hasEnteredStudio = true
+                }
                 .preferredColorScheme(.dark)
+            }
         }
     }
 }

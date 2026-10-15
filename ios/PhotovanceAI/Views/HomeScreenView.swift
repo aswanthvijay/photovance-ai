@@ -49,11 +49,11 @@ struct HomeScreenView: View {
 
     var selectedModelName: String {
         switch selectedModelKey {
-        case "flux_klein": return "Flux.2 Klein 4B Turbo (4-Step DiT)"
-        case "flux_klein_ultra": return "Flux.2 Klein 4B Master (FP16)"
-        case "realvis_xl": return "RealVisXL v5.0 (SDXL)"
-        case "serenity": return "Serenity v2.1 (SD1.5)"
-        default: return selectedModelKey
+        case "flux_klein": return "Photovance Ultra-Portrait™"
+        case "flux_klein_ultra": return "Editorial Couture Master™"
+        case "realvis_xl": return "Classic 35mm Film™"
+        case "serenity": return "Studio Glamour Soft™"
+        default: return "Photovance Ultra-Portrait™"
         }
     }
 
@@ -88,6 +88,21 @@ struct HomeScreenView: View {
                     Spacer()
 
                     HStack(spacing: 8) {
+                        // Smart Hybrid Engine Pill
+                        let isNpuCapable = DeviceCapabilityDetector.shared.currentSpec.supportsLocalNpuStudio
+                        Button {
+                            showSettingsSheet = true
+                        } label: {
+                            Text(isNpuCapable ? "⚡ Local NPU" : "☁️ Cloud 8K")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.neonCyan)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.accentIndigo.opacity(0.2))
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Color.neonCyan.opacity(0.5), lineWidth: 1))
+                        }
+
                         // Status Pill
                         Button {
                             showSettingsSheet = true

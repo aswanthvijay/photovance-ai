@@ -7,35 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DBD71E62D602479085AE65C6 /* PhotovanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EED4115F59E464097EBF789 /* PhotovanceApp.swift */; };
-		47F0985B823441B3AD1AFE22 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB97A99DEFE14DDD9DB94C04 /* Theme.swift */; };
-		2A9BC2C26BCE43B48C275140 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E310282167402AB2B6A37C /* Models.swift */; };
-		C52A57B20BE8436085F012F6 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EFE0498FF1342AAA9ED0731 /* ApiClient.swift */; };
-		C4077FCF5A644284A14CD34A /* StyleCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D67FBD544314824B7E47073 /* StyleCardView.swift */; };
-		BA45B88A905B48208FBEFFAB /* NeuralScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A451B4333E94489B32E264C /* NeuralScanView.swift */; };
-		50D2A18B75774E54945CA6FE /* BeforeAfterSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E5F67F05824F2FB51EF426 /* BeforeAfterSliderView.swift */; };
-		875A757F98154B27A9B78FAE /* HomeScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458EA5021A194105A0A644A4 /* HomeScreenView.swift */; };
-		467DFBA246AB4977A28347B1 /* StudioSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 294E580271134A9F8493B19B /* StudioSettingsSheet.swift */; };
-		63E7610EB28B42058F4F3220 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6629F27C9C394692A9B0B93E /* Assets.xcassets */; };
+		A3E448A47A394023B974ECFA /* PhotovanceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F6DB7B19824EDBBE22EF31 /* PhotovanceApp.swift */; };
+		A41270750E9949A89CE589FC /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160F2C4EFA854577965B991C /* Theme.swift */; };
+		843965079DFC4B71B1F4A8CC /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9DB43BAD894F0589AEACF2 /* Models.swift */; };
+		01983A23660345C9AD09E0A1 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F6BF7ABAD594A0A88BF1E78 /* ApiClient.swift */; };
+		7B0742A6CFF54F3AA9F43579 /* StyleCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD81A8194A744E88B39D76B /* StyleCardView.swift */; };
+		0C9DF587D964418C8D1C1165 /* NeuralScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD31338519E847BDA8FF8858 /* NeuralScanView.swift */; };
+		2DE9DBA67CAC4A96AA750B82 /* BeforeAfterSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF6EFF244A242E791FCFB8E /* BeforeAfterSliderView.swift */; };
+		8432DF2A1B2D424894554EF2 /* HomeScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F465DE4DFC42489DE7205B /* HomeScreenView.swift */; };
+		4CEBFA7E8D6D41FFA141C076 /* StudioSettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4D2C135DFD4334AD4AF854 /* StudioSettingsSheet.swift */; };
+		54D15A420EC14D26875903CB /* DeviceCapabilityDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2D42EBDAEE4CBB819DCCBE /* DeviceCapabilityDetector.swift */; };
+		F182E8D008C040DCAD60AF1A /* KeychainVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1EACCE50D7B489EAD16CFBB /* KeychainVault.swift */; };
+		E40F8A1BCC894A58B208D592 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E003653B2DA2444EA915416F /* AuthManager.swift */; };
+		BB5D6EBFEABC4D0998EB1F4E /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C576FAF88A4ECDA3A0D3F8 /* AuthView.swift */; };
+		B87568E0E1B84A138591A49E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5CCF057704B472ABF6EB93E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		F32CFED97BD34BDD9F6CB62B /* PhotovanceAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotovanceAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9EED4115F59E464097EBF789 /* PhotovanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhotovanceApp.swift"; path = "App/PhotovanceApp.swift"; sourceTree = "<group>"; };
-		DF96356B01E840E58A29FA1F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info.plist"; path = "App/Info.plist"; sourceTree = "<group>"; };
-		AB97A99DEFE14DDD9DB94C04 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Theme.swift"; path = "Theme/Theme.swift"; sourceTree = "<group>"; };
-		69E310282167402AB2B6A37C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Models.swift"; path = "Network/Models.swift"; sourceTree = "<group>"; };
-		4EFE0498FF1342AAA9ED0731 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ApiClient.swift"; path = "Network/ApiClient.swift"; sourceTree = "<group>"; };
-		1D67FBD544314824B7E47073 /* StyleCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "StyleCardView.swift"; path = "Components/StyleCardView.swift"; sourceTree = "<group>"; };
-		6A451B4333E94489B32E264C /* NeuralScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "NeuralScanView.swift"; path = "Components/NeuralScanView.swift"; sourceTree = "<group>"; };
-		04E5F67F05824F2FB51EF426 /* BeforeAfterSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BeforeAfterSliderView.swift"; path = "Components/BeforeAfterSliderView.swift"; sourceTree = "<group>"; };
-		458EA5021A194105A0A644A4 /* HomeScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HomeScreenView.swift"; path = "Views/HomeScreenView.swift"; sourceTree = "<group>"; };
-		294E580271134A9F8493B19B /* StudioSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "StudioSettingsSheet.swift"; path = "Views/StudioSettingsSheet.swift"; sourceTree = "<group>"; };
-		6629F27C9C394692A9B0B93E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Assets.xcassets"; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		B02B5D1CAA7A45678DECBC7D /* PhotovanceAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotovanceAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		41F6DB7B19824EDBBE22EF31 /* PhotovanceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhotovanceApp.swift"; path = "App/PhotovanceApp.swift"; sourceTree = "<group>"; };
+		FC386FC0917F4F78BEFE2FA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info.plist"; path = "App/Info.plist"; sourceTree = "<group>"; };
+		160F2C4EFA854577965B991C /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Theme.swift"; path = "Theme/Theme.swift"; sourceTree = "<group>"; };
+		FC9DB43BAD894F0589AEACF2 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Models.swift"; path = "Network/Models.swift"; sourceTree = "<group>"; };
+		0F6BF7ABAD594A0A88BF1E78 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ApiClient.swift"; path = "Network/ApiClient.swift"; sourceTree = "<group>"; };
+		7DD81A8194A744E88B39D76B /* StyleCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "StyleCardView.swift"; path = "Components/StyleCardView.swift"; sourceTree = "<group>"; };
+		DD31338519E847BDA8FF8858 /* NeuralScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "NeuralScanView.swift"; path = "Components/NeuralScanView.swift"; sourceTree = "<group>"; };
+		8AF6EFF244A242E791FCFB8E /* BeforeAfterSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "BeforeAfterSliderView.swift"; path = "Components/BeforeAfterSliderView.swift"; sourceTree = "<group>"; };
+		39F465DE4DFC42489DE7205B /* HomeScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HomeScreenView.swift"; path = "Views/HomeScreenView.swift"; sourceTree = "<group>"; };
+		6D4D2C135DFD4334AD4AF854 /* StudioSettingsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "StudioSettingsSheet.swift"; path = "Views/StudioSettingsSheet.swift"; sourceTree = "<group>"; };
+		7C2D42EBDAEE4CBB819DCCBE /* DeviceCapabilityDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "DeviceCapabilityDetector.swift"; path = "Hardware/DeviceCapabilityDetector.swift"; sourceTree = "<group>"; };
+		A1EACCE50D7B489EAD16CFBB /* KeychainVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "KeychainVault.swift"; path = "Security/KeychainVault.swift"; sourceTree = "<group>"; };
+		E003653B2DA2444EA915416F /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthManager.swift"; path = "Network/AuthManager.swift"; sourceTree = "<group>"; };
+		B9C576FAF88A4ECDA3A0D3F8 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "AuthView.swift"; path = "Views/AuthView.swift"; sourceTree = "<group>"; };
+		C5CCF057704B472ABF6EB93E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Assets.xcassets"; path = "Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		1183254E32CC4EFE958BFA07 /* Frameworks */ = {
+		F19FBB6AAF3A4624A1B8DF1C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -45,36 +53,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B154D48C66E247B0B0D32A62 = {
+		7911F1468AB14A4EA4D92496 = {
 			isa = PBXGroup;
 			children = (
-				D3C45B78803B471D9373ED27 /* PhotovanceAI */,
-				490B1356248C4F34AF3E8215 /* Products */,
+				654E96F5922844AF86C14A6F /* PhotovanceAI */,
+				D2FC2803CFF946CD9B11E85D /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		490B1356248C4F34AF3E8215 /* Products */ = {
+		D2FC2803CFF946CD9B11E85D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F32CFED97BD34BDD9F6CB62B /* PhotovanceAI.app */,
+				B02B5D1CAA7A45678DECBC7D /* PhotovanceAI.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D3C45B78803B471D9373ED27 /* PhotovanceAI */ = {
+		654E96F5922844AF86C14A6F /* PhotovanceAI */ = {
 			isa = PBXGroup;
 			children = (
-				9EED4115F59E464097EBF789 /* PhotovanceApp.swift */,
-				DF96356B01E840E58A29FA1F /* Info.plist */,
-				AB97A99DEFE14DDD9DB94C04 /* Theme.swift */,
-				69E310282167402AB2B6A37C /* Models.swift */,
-				4EFE0498FF1342AAA9ED0731 /* ApiClient.swift */,
-				1D67FBD544314824B7E47073 /* StyleCardView.swift */,
-				6A451B4333E94489B32E264C /* NeuralScanView.swift */,
-				04E5F67F05824F2FB51EF426 /* BeforeAfterSliderView.swift */,
-				458EA5021A194105A0A644A4 /* HomeScreenView.swift */,
-				294E580271134A9F8493B19B /* StudioSettingsSheet.swift */,
-				6629F27C9C394692A9B0B93E /* Assets.xcassets */,
+				41F6DB7B19824EDBBE22EF31 /* PhotovanceApp.swift */,
+				FC386FC0917F4F78BEFE2FA6 /* Info.plist */,
+				160F2C4EFA854577965B991C /* Theme.swift */,
+				FC9DB43BAD894F0589AEACF2 /* Models.swift */,
+				0F6BF7ABAD594A0A88BF1E78 /* ApiClient.swift */,
+				7DD81A8194A744E88B39D76B /* StyleCardView.swift */,
+				DD31338519E847BDA8FF8858 /* NeuralScanView.swift */,
+				8AF6EFF244A242E791FCFB8E /* BeforeAfterSliderView.swift */,
+				39F465DE4DFC42489DE7205B /* HomeScreenView.swift */,
+				6D4D2C135DFD4334AD4AF854 /* StudioSettingsSheet.swift */,
+				7C2D42EBDAEE4CBB819DCCBE /* DeviceCapabilityDetector.swift */,
+				A1EACCE50D7B489EAD16CFBB /* KeychainVault.swift */,
+				E003653B2DA2444EA915416F /* AuthManager.swift */,
+				B9C576FAF88A4ECDA3A0D3F8 /* AuthView.swift */,
+				C5CCF057704B472ABF6EB93E /* Assets.xcassets */,
 			);
 			path = PhotovanceAI;
 			sourceTree = "<group>";
@@ -82,13 +94,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6D1F2174B1B14050859BBDDA /* PhotovanceAI */ = {
+		AB59AE129F314B328153E7F3 /* PhotovanceAI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B10BD84A3ADC4D55BE9ABDAC /* Build configuration list for PBXNativeTarget "PhotovanceAI" */;
+			buildConfigurationList = C57CB88450914BF98661C557 /* Build configuration list for PBXNativeTarget "PhotovanceAI" */;
 			buildPhases = (
-				C18DF57422CA41D8BB7F4AEA /* Sources */,
-				1183254E32CC4EFE958BFA07 /* Frameworks */,
-				1963B28C2F074EA89E605AE5 /* Resources */,
+				53B2AD7F9468491EAF59F7C0 /* Sources */,
+				F19FBB6AAF3A4624A1B8DF1C /* Frameworks */,
+				786DD94B98CA444D810644EA /* Resources */,
 			);
 			buildRules = (
 			);
@@ -96,24 +108,24 @@
 			);
 			name = PhotovanceAI;
 			productName = PhotovanceAI;
-			productReference = F32CFED97BD34BDD9F6CB62B /* PhotovanceAI.app */;
+			productReference = B02B5D1CAA7A45678DECBC7D /* PhotovanceAI.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		8254ED67E755448A8AD6CBA5 /* Project object */ = {
+		D2338BB50E014A9BBE6A9AE9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastUpgradeCheck = 1540;
 				TargetAttributes = {
-					6D1F2174B1B14050859BBDDA = {
+					AB59AE129F314B328153E7F3 = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
-			buildConfigurationList = 36AE93AFC96F43A5B695C00A /* Build configuration list for PBXProject "PhotovanceAI" */;
+			buildConfigurationList = CAB1503931F44BE7B9B045EB /* Build configuration list for PBXProject "PhotovanceAI" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -121,48 +133,52 @@
 				en,
 				Base,
 			);
-			mainGroup = B154D48C66E247B0B0D32A62;
-			productRefGroup = 490B1356248C4F34AF3E8215 /* Products */;
+			mainGroup = 7911F1468AB14A4EA4D92496;
+			productRefGroup = D2FC2803CFF946CD9B11E85D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6D1F2174B1B14050859BBDDA /* PhotovanceAI */,
+				AB59AE129F314B328153E7F3 /* PhotovanceAI */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		1963B28C2F074EA89E605AE5 /* Resources */ = {
+		786DD94B98CA444D810644EA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				63E7610EB28B42058F4F3220 /* Assets.xcassets in Resources */,
+				B87568E0E1B84A138591A49E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C18DF57422CA41D8BB7F4AEA /* Sources */ = {
+		53B2AD7F9468491EAF59F7C0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBD71E62D602479085AE65C6 /* PhotovanceApp.swift in Sources */,
-				47F0985B823441B3AD1AFE22 /* Theme.swift in Sources */,
-				2A9BC2C26BCE43B48C275140 /* Models.swift in Sources */,
-				C52A57B20BE8436085F012F6 /* ApiClient.swift in Sources */,
-				C4077FCF5A644284A14CD34A /* StyleCardView.swift in Sources */,
-				BA45B88A905B48208FBEFFAB /* NeuralScanView.swift in Sources */,
-				50D2A18B75774E54945CA6FE /* BeforeAfterSliderView.swift in Sources */,
-				875A757F98154B27A9B78FAE /* HomeScreenView.swift in Sources */,
-				467DFBA246AB4977A28347B1 /* StudioSettingsSheet.swift in Sources */,
+				A3E448A47A394023B974ECFA /* PhotovanceApp.swift in Sources */,
+				A41270750E9949A89CE589FC /* Theme.swift in Sources */,
+				843965079DFC4B71B1F4A8CC /* Models.swift in Sources */,
+				01983A23660345C9AD09E0A1 /* ApiClient.swift in Sources */,
+				7B0742A6CFF54F3AA9F43579 /* StyleCardView.swift in Sources */,
+				0C9DF587D964418C8D1C1165 /* NeuralScanView.swift in Sources */,
+				2DE9DBA67CAC4A96AA750B82 /* BeforeAfterSliderView.swift in Sources */,
+				8432DF2A1B2D424894554EF2 /* HomeScreenView.swift in Sources */,
+				4CEBFA7E8D6D41FFA141C076 /* StudioSettingsSheet.swift in Sources */,
+				54D15A420EC14D26875903CB /* DeviceCapabilityDetector.swift in Sources */,
+				F182E8D008C040DCAD60AF1A /* KeychainVault.swift in Sources */,
+				E40F8A1BCC894A58B208D592 /* AuthManager.swift in Sources */,
+				BB5D6EBFEABC4D0998EB1F4E /* AuthView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		7CA8BD099F48455091EC7CBE /* Debug */ = {
+		487F516C99C34A448F03DEC8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -187,7 +203,7 @@
 			};
 			name = Debug;
 		};
-		69577AFC1440436B991A3646 /* Release */ = {
+		A4AFDB06A1A84CE090EB555A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -209,7 +225,7 @@
 			};
 			name = Release;
 		};
-		437DAAC0B51E499982AEC698 /* Debug */ = {
+		BD869E2E403E4EED86733312 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -235,7 +251,7 @@
 			};
 			name = Debug;
 		};
-		7BF89A3ED2B24C8C98CF87FE /* Release */ = {
+		17383ABAB34741B5A5075B97 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -264,20 +280,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		36AE93AFC96F43A5B695C00A /* Build configuration list for PBXProject "PhotovanceAI" */ = {
+		CAB1503931F44BE7B9B045EB /* Build configuration list for PBXProject "PhotovanceAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7CA8BD099F48455091EC7CBE /* Debug */,
-				69577AFC1440436B991A3646 /* Release */,
+				487F516C99C34A448F03DEC8 /* Debug */,
+				A4AFDB06A1A84CE090EB555A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B10BD84A3ADC4D55BE9ABDAC /* Build configuration list for PBXNativeTarget "PhotovanceAI" */ = {
+		C57CB88450914BF98661C557 /* Build configuration list for PBXNativeTarget "PhotovanceAI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				437DAAC0B51E499982AEC698 /* Debug */,
-				7BF89A3ED2B24C8C98CF87FE /* Release */,
+				BD869E2E403E4EED86733312 /* Debug */,
+				17383ABAB34741B5A5075B97 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -285,5 +301,5 @@
 /* End XCConfigurationList section */
 
 	};
-	rootObject = 8254ED67E755448A8AD6CBA5 /* Project object */;
+	rootObject = D2338BB50E014A9BBE6A9AE9 /* Project object */;
 }

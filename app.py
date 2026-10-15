@@ -41,14 +41,22 @@ from engine import (
 from segmentation import generate_dress_mask
 from face_lock import apply_face_lock
 
+from security import RateLimiter, ImageSanitizer, SafePath, TTLCacheCleaner, MAX_PAYLOAD_SIZE
+
 HISTORY = []
+RATE_LIMITER = RateLimiter(max_requests=8, window_seconds=60)
+
+# Start 24-hour background ephemeral cache cleaner
+TTLCacheCleaner.start([config.INPUTS_DIR, config.OUTPUTS_DIR], max_age_seconds=86400)
 
 
 class DressChangerHandler(BaseHTTPRequestHandler):
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
         super().end_headers()
 
     def do_OPTIONS(self):
@@ -115,27 +123,50 @@ class DressChangerHandler(BaseHTTPRequestHandler):
 
         if path.startswith("/inputs/"):
             filename = Path(path[len("/inputs/"):].strip("/")).name
-            self.serve_file(config.INPUTS_DIR / filename)
+            safe = SafePath.sanitize(config.INPUTS_DIR, filename)
+            if safe and safe.is_file():
+                self.serve_file(safe)
+            else:
+                self.send_response(404); self.end_headers()
             return
 
         if path.startswith("/outputs/"):
             filename = Path(path[len("/outputs/"):].strip("/")).name
-            self.serve_file(config.OUTPUTS_DIR / filename)
+            safe = SafePath.sanitize(config.OUTPUTS_DIR, filename)
+            if safe and safe.is_file():
+                self.serve_file(safe)
+            else:
+                self.send_response(404); self.end_headers()
             return
 
         if path.startswith("/samples/"):
             filename = Path(path[len("/samples/"):].strip("/")).name
-            self.serve_file(config.SAMPLES_DIR / filename)
+            safe = SafePath.sanitize(config.SAMPLES_DIR, filename)
+            if safe and safe.is_file():
+                self.serve_file(safe)
+            else:
+                self.send_response(404); self.end_headers()
             return
 
         self.send_response(404)
         self.end_headers()
 
     def do_POST(self):
+        client_ip = self.client_address[0]
         path = self.path.split("?")[0]
 
         if path == "/api/upload":
+            # Rate limiting check
+            allowed, wait_sec = RATE_LIMITER.is_allowed(f"upload_{client_ip}")
+            if not allowed:
+                self.send_json({"error": f"Upload rate limit exceeded. Please wait {wait_sec}s."}, status=429)
+                return
+
             content_length = int(self.headers.get("content-length", 0))
+            if content_length > MAX_PAYLOAD_SIZE:
+                self.send_json({"error": "Payload exceeds maximum allowed size (10MB)."}, status=413)
+                return
+
             raw_body = self.rfile.read(content_length)
             content_type = self.headers.get("content-type", "")
 
@@ -162,17 +193,18 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                 self.send_json({"error": "No image data received"}, status=400)
                 return
 
-            image_id = f"upload_{uuid.uuid4().hex[:12]}.png"
-            target_path = config.INPUTS_DIR / image_id
-
-            try:
-                with Image.open(io.BytesIO(image_bytes)) as img:
-                    rgb_img = img.convert("RGB")
-                    rgb_img.save(target_path, "PNG")
-                    w, h = rgb_img.size
-            except Exception as e:
-                self.send_json({"error": f"Failed to decode image: {e}"}, status=400)
+            # Cybersecurity: Sanitize image bytes, strip metadata, verify magic bytes
+            valid, clean_bytes, err = ImageSanitizer.sanitize(image_bytes)
+            if not valid:
+                self.send_json({"error": err}, status=400)
                 return
+
+            image_id = f"upload_{uuid.uuid4().hex[:12]}.jpg"
+            target_path = config.INPUTS_DIR / image_id
+            target_path.write_bytes(clean_bytes)
+
+            with Image.open(io.BytesIO(clean_bytes)) as img:
+                w, h = img.size
 
             self.send_json({
                 "image_id": image_id,
@@ -183,8 +215,18 @@ class DressChangerHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/change-dress":
+            # Rate limiting check (protect GPU compute)
+            allowed, wait_sec = RATE_LIMITER.is_allowed(f"render_{client_ip}")
+            if not allowed:
+                self.send_json({"error": f"Studio GPU busy. Please wait {wait_sec}s before next creation."}, status=429)
+                return
+
             try:
                 content_length = int(self.headers.get("content-length", 0))
+                if content_length > 64 * 1024:  # JSON prompt payload shouldn't exceed 64KB
+                    self.send_json({"error": "Request body too large."}, status=413)
+                    return
+
                 body = self.rfile.read(content_length).decode("utf-8")
                 data = json.loads(body)
 
@@ -202,16 +244,17 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                     self.send_json({"error": "Image and prompt are required."}, status=400)
                     return
 
-                # Resolve image file
+                # Safe file resolution (Path Traversal Defense)
+                raw_filename = Path(image_id).name
                 if image_id.startswith("samples/"):
-                    source_path = config.SAMPLES_DIR / Path(image_id).name
+                    source_path = SafePath.sanitize(config.SAMPLES_DIR, raw_filename)
                 elif image_id.startswith("outputs/"):
-                    source_path = config.OUTPUTS_DIR / Path(image_id).name
+                    source_path = SafePath.sanitize(config.OUTPUTS_DIR, raw_filename)
                 else:
-                    source_path = config.INPUTS_DIR / Path(image_id).name
+                    source_path = SafePath.sanitize(config.INPUTS_DIR, raw_filename)
 
-                if not source_path.exists():
-                    self.send_json({"error": "Source image not found."}, status=404)
+                if not source_path or not source_path.exists():
+                    self.send_json({"error": "Source image not found or access denied."}, status=404)
                     return
 
                 start_time = time.monotonic()

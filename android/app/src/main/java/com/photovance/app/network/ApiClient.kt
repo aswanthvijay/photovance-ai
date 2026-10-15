@@ -2,6 +2,7 @@ package com.photovance.app.network
 
 import android.content.Context
 import okhttp3.OkHttpClient
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -84,8 +85,8 @@ object ApiClient {
         }
 
     fun getFullUrl(relativeUrl: String): String {
-        val clean = relativeUrl.removePrefix("/")
-        return "$baseUrl$clean"
+        return baseUrl.toHttpUrl().resolve(relativeUrl)?.toString()
+            ?: throw IllegalArgumentException("The studio returned an invalid photo address.")
     }
 }
 
