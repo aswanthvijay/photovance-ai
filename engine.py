@@ -121,8 +121,9 @@ def build_flux_klein_graph(
         if "maintain" not in clean_prompt.lower() and "face" not in clean_prompt.lower():
             formatted_prompt = (
                 f"{clean_prompt}. "
-                "Maintain the person's exact face, eyes, smile, and facial identity from the reference image. "
-                "Photorealistic 8k uhd, masterpiece, natural skin texture, sharp focus."
+                "Maintain the person's exact face, eyes, natural mouth shape, and facial identity from the reference image. "
+                "Calm composed expression, closed lips, cinematic 85mm portrait photography, shallow depth of field, "
+                "creamy background bokeh, authentic warm skin tones, natural skin texture with subtle micro pores, 8k uhd, masterpiece."
             )
         else:
             formatted_prompt = clean_prompt
@@ -281,9 +282,9 @@ def build_sd_txt2img_graph(
     prompt_weight = 1.2 if is_sdxl else 1.25
     positive_prompt = (
         f"({clean_prompt}:{prompt_weight}), "
-        "photorealistic portrait, natural human skin texture, authentic micro pores, "
-        "subsurface scattering, delicate fine lines, sharp focus, cinematic lighting, "
-        "professional 35mm DSLR photography, 8k uhd, masterpiece"
+        "photorealistic luxury editorial portrait, natural human skin texture, authentic micro pores, "
+        "subsurface scattering, delicate fine lines, sharp focus, 85mm portrait lens, f/1.4, shallow depth of field, "
+        "creamy background bokeh, soft cinematic lighting, 8k uhd, masterpiece"
     )
     if not negative_prompt or not negative_prompt.strip():
         negative_prompt = config.DEFAULT_NEGATIVE_PROMPT

@@ -59,8 +59,8 @@ MODELS = {
     },
     "realvis_xl": {
         "id": "realvis_xl",
-        "name": "Classic 35mm Film™",
-        "desc": "Warm cinematic grain and analog photographic depth with natural skin tones.",
+        "name": "Editorial Luxury Studio (DSLR 85mm)™",
+        "desc": "High-fashion Vogue aesthetic, 85mm portrait telephoto lens, creamy bokeh, and authentic golden skin tones.",
         "type": "sdxl",
         "checkpoint": "RealVisXL_V5.0_fp16.safetensors",
         "target_size": 896,
@@ -91,6 +91,7 @@ SAMPLES_DIR = WORKSPACE_ROOT / "samples"
 
 # Default Negative Prompt
 DEFAULT_NEGATIVE_PROMPT = (
+    "open mouth, teeth, forced smile, grinning, wide angle distortion, selfie, flat flash, fisheye, "
     "cartoon, painting, illustration, 3d render, CGI, plastic skin, doll, airbrushed, "
     "porcelain skin, smooth plastic, mannequin, wax figure, fake eyes, artificial, "
     "oversaturated, blurry, out of focus, bad anatomy, deformed, mutated hands, "
