@@ -92,6 +92,7 @@ SAMPLES_DIR = WORKSPACE_ROOT / "samples"
 # Default Negative Prompt
 DEFAULT_NEGATIVE_PROMPT = (
     "cartoon, painting, illustration, 3d render, CGI, plastic skin, doll, airbrushed, "
+    "porcelain skin, smooth plastic, mannequin, wax figure, fake eyes, artificial, "
     "oversaturated, blurry, out of focus, bad anatomy, deformed, mutated hands, "
     "extra fingers, fused fingers, extra limbs, asymmetric eyes, bad proportions, "
     "watermark, signature, text, logo, distorted face"

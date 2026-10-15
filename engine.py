@@ -281,8 +281,9 @@ def build_sd_txt2img_graph(
     prompt_weight = 1.2 if is_sdxl else 1.25
     positive_prompt = (
         f"({clean_prompt}:{prompt_weight}), "
-        "photorealistic portrait, beautiful face, natural skin texture, masterpiece, "
-        "8k uhd, sharp focus, professional photography, studio lighting"
+        "photorealistic portrait, natural human skin texture, authentic micro pores, "
+        "subsurface scattering, delicate fine lines, sharp focus, cinematic lighting, "
+        "professional 35mm DSLR photography, 8k uhd, masterpiece"
     )
     if not negative_prompt or not negative_prompt.strip():
         negative_prompt = config.DEFAULT_NEGATIVE_PROMPT
