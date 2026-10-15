@@ -1,0 +1,59 @@
+# Android Build & Cache
+android/.gradle/
+android/app/build/
+android/local.properties
+android/*.iml
+android/.idea/
+android/.DS_Store
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# AI Models & Large Weights
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.bin
+gfpgan/weights/
+models/
+
+# Local Runtime & Inputs / Outputs
+inputs/
+outputs/
+test_*.png
+clipseg_test.png
+flux_klein_output.png
+finished_shoulder_crop.png
+source_shoulder_crop.png
+raw_shoulder_crop.png
+preview_shoulder_fixed.png
+mask_shoulder_crop.png
+
+# Xcode & macOS
+.DS_Store
+*.xcuserstate
+project.xcworkspace
+xcuserdata/
+*.xcarchive
+Payload/
+*.ipa
+
+# Cloudflare & Secrets
+.cloudflared/
+*.pem
+*.key

@@ -1,0 +1,51 @@
+name: Build Photovance AI iOS App (.ipa)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Compile Native iOS Release
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Verify Xcode & Swift Environment
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Build Archive (Release)
+        run: |
+          cd ios
+          xcodebuild archive \
+            -project PhotovanceAI.xcodeproj \
+            -scheme PhotovanceAI \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath PhotovanceAI.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package Distributable .ipa
+        run: |
+          cd ios
+          mkdir -p Payload
+          cp -r PhotovanceAI.xcarchive/Products/Applications/PhotovanceAI.app Payload/
+          zip -r PhotovanceAI-Release.ipa Payload
+          ls -lh PhotovanceAI-Release.ipa
+
+      - name: Upload iOS Release Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhotovanceAI-iOS-Release
+          path: ios/PhotovanceAI-Release.ipa
+          retention-days: 30

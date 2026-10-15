@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "style_tokyo_street.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}
