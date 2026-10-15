@@ -24,9 +24,9 @@ let VISUAL_STYLE_PRESETS: [StylePreset] = [
     ),
     StylePreset(
         id: "cannes_gala",
-        title = "Cannes Gala",
-        subtitle = "Emerald Velvet",
-        prompt = "haute couture emerald green velvet backless evening gown, diamond necklace, at a prestigious Cannes red carpet film premiere, paparazzi flashlights, ultra detailed 8k",
+        title: "Cannes Gala",
+        subtitle: "Emerald Velvet",
+        prompt: "haute couture emerald green velvet backless evening gown, diamond necklace, at a prestigious Cannes red carpet film premiere, paparazzi flashlights, ultra detailed 8k",
         imageName: "style_cannes_gala",
         badge: "👑 VIP",
         category: "Red Carpet",
@@ -77,7 +77,6 @@ let VISUAL_STYLE_PRESETS: [StylePreset] = [
 struct StyleCardView: View {
     let preset: StylePreset
     let isSelected: Bool
-    let onSelect: () -> Unit? = nil
     let action: () -> Void
 
     var body: some View {

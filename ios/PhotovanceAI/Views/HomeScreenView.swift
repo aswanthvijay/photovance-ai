@@ -617,7 +617,17 @@ struct HomeScreenView: View {
 
         isGenerating = true
         elapsedSeconds = 0
-        let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+        Task {
+            while isGenerating {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                if isGenerating {
+                    await MainActor.run {
+                        elapsedSeconds += 1
+                    }
+                }
+            }
+        }
 
         Task {
             do {
