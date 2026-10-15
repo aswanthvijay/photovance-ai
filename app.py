@@ -239,10 +239,19 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                 target = data.get("target", "dress")
                 expand = int(data.get("expand", 5))
                 keep_face = bool(data.get("keep_face", True))
+                variations = int(data.get("variations", 1))
+                garment_id = data.get("garment_id", None)
 
                 if not image_id or not prompt:
                     self.send_json({"error": "Image and prompt are required."}, status=400)
                     return
+
+                # Virtual Wardrobe support
+                if garment_id:
+                    raw_garment = Path(garment_id).name
+                    garment_path = SafePath.sanitize(config.INPUTS_DIR, raw_garment)
+                    if garment_path and garment_path.exists():
+                        prompt = f"wearing reference outfit ({prompt}), perfect fabric texture, accurate color and cut"
 
                 # Safe file resolution (Path Traversal Defense)
                 raw_filename = Path(image_id).name
@@ -272,6 +281,8 @@ class DressChangerHandler(BaseHTTPRequestHandler):
 
                 ensure_backend()
                 src_sub = upload_image(source_path)
+
+                results_list = [f"/outputs/{result_filename}"]
 
                 if mode == "face_studio":
                     # Unrestricted Face Studio: Generate ANY prompt, outfit, scene, or pose preserving face
@@ -307,6 +318,26 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                     rendered = apply_face_lock(source_img, rendered)
                     rendered.save(result_path, "PNG")
 
+                    if variations > 1:
+                        for v_idx in range(1, min(variations, 4)):
+                            v_job_id = f"{job_id}_v{v_idx}"
+                            v_filename = f"result_{v_job_id}.png"
+                            v_path = config.OUTPUTS_DIR / v_filename
+                            v_graph, _ = build_workflow_graph(
+                                src_sub,
+                                None,
+                                prompt=f"{prompt}, variation {v_idx+1}",
+                                negative_prompt=negative_prompt,
+                                model_key=model_key,
+                                mode="face_studio",
+                                width=w,
+                                height=h
+                            )
+                            v_rendered = execute_workflow(v_graph)
+                            v_rendered = apply_face_lock(source_img, v_rendered)
+                            v_rendered.save(v_path, "PNG")
+                            results_list.append(f"/outputs/{v_filename}")
+
                 else:
                     # In-Place Outfit Swap: Detect clothing mask and transform within original photo
                     mask, preview_overlay, face_boxes, coverage = generate_dress_mask(
@@ -340,6 +371,28 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                         finished = apply_face_lock(source_img, finished)
                     finished.save(result_path, "PNG")
 
+                    if variations > 1:
+                        for v_idx in range(1, min(variations, 4)):
+                            v_job_id = f"{job_id}_v{v_idx}"
+                            v_filename = f"result_{v_job_id}.png"
+                            v_path = config.OUTPUTS_DIR / v_filename
+                            v_graph, _ = build_workflow_graph(
+                                src_sub,
+                                msk_sub,
+                                prompt=f"{prompt}, variation {v_idx+1}",
+                                negative_prompt=negative_prompt,
+                                model_key=model_key,
+                                mode="in_place",
+                                width=w,
+                                height=h
+                            )
+                            v_rendered = execute_workflow(v_graph)
+                            v_finished = composite_and_finish(source_img, v_rendered, None if is_flux else mask)
+                            if keep_face:
+                                v_finished = apply_face_lock(source_img, v_finished)
+                            v_finished.save(v_path, "PNG")
+                            results_list.append(f"/outputs/{v_filename}")
+
                 elapsed = round(time.monotonic() - start_time, 1)
                 model_name = model_info.get("name", model_key)
 
@@ -357,6 +410,7 @@ class DressChangerHandler(BaseHTTPRequestHandler):
                     "success": True,
                     "result_url": f"/outputs/{result_filename}",
                     "preview_url": f"/outputs/{preview_filename}",
+                    "results": results_list,
                     "elapsed": elapsed,
                     "model_name": model_name,
                     "mode": mode,

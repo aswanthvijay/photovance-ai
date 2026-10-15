@@ -32,6 +32,10 @@ import com.photovance.app.ui.Creation
 import com.photovance.app.ui.StudioViewModel
 import com.photovance.app.ui.components.*
 
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
 @Composable
 fun HomeScreen(studio: StudioViewModel, onSettings: () -> Unit) {
     val scroll = rememberScrollState()
@@ -50,14 +54,27 @@ fun HomeScreen(studio: StudioViewModel, onSettings: () -> Unit) {
             savePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         } else studio.save()
     }
+
+    if (studio.showPaywall) {
+        PaywallSheet(
+            onDismiss = studio::dismissPaywall,
+            onSubscribe = studio::subscribeVip,
+            onRestore = studio::restorePurchases
+        )
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             val engineMode by studio.engineMode.collectAsState()
+            val isVip by studio.isVip.collectAsState()
+            val credits by studio.remainingCredits.collectAsState()
             Column {
                 StudioHeader(
                     onSettings = onSettings,
                     onBack = if (studio.step > 0 && !studio.isGenerating) ({ studio.goToStep(studio.step - 1) }) else null,
+                    vipBadgeTitle = if (isVip) "👑 VIP" else "✨ $credits Free",
+                    onTapVip = { studio.openPaywall() },
                     engineModeTitle = if (studio.hybridRouter.deviceSpec.supportsLocalNpuStudio) {
                         if (engineMode == com.photovance.app.engine.StudioEngineMode.LOCAL_OFFLINE) "⚡ Local NPU" else "☁️ Cloud 8K"
                     } else "☁️ Cloud 8K",
@@ -94,7 +111,7 @@ fun HomeScreen(studio: StudioViewModel, onSettings: () -> Unit) {
             when (studio.step) {
                 0 -> PhotoScreen(studio.photoModel, studio.hasPhoto, choosePhoto, studio::selectSample)
                 1 -> StyleScreen(studio, choosePhoto, onSettings)
-                2 -> studio.result?.let { ResultScreen(it, studio.isExporting, studio::share,
+                2 -> studio.result?.let { ResultScreen(it, studio.isExporting, studio, studio::share, studio::shareStory,
                     { studio.goToStep(if (studio.hasPhoto) 1 else 0) }) }
             }
             if (studio.step == 0) {
@@ -170,14 +187,29 @@ fun StyleScreen(studio: StudioViewModel, onChoose: () -> Unit, onOptions: () -> 
         }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("face_studio" to "Face Studio", "in_place" to "Outfit Swap").forEach { (key, title) ->
+                listOf("face_studio" to "Face Studio", "in_place" to "Outfit Swap", "wardrobe" to "Virtual Wardrobe 👗").forEach { (key, title) ->
                     FilterChip(selected = studio.mode == key, onClick = { studio.mode = key },
                         enabled = !studio.isGenerating, label = { Text(title) }, modifier = Modifier.weight(1f))
                 }
             }
-            Text(if (studio.mode == "face_studio") "Reimagine your portrait with a new outfit and scene."
-                else "Change your outfit while keeping the original scene.",
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                when (studio.mode) {
+                    "face_studio" -> "Reimagine your portrait with a new outfit and scene."
+                    "wardrobe" -> "Upload any garment to drape directly onto your portrait."
+                    else -> "Change your outfit while keeping the original scene."
+                },
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        if (studio.mode == "wardrobe") {
+            VirtualWardrobePicker(
+                garmentUri = studio.garmentUri,
+                onSelectGarment = studio::setGarment,
+                onApplyTag = { tag ->
+                    studio.editPrompt("${studio.prompt.trimEnd().trimEnd(',')}, wearing $tag".trimStart(',', ' '))
+                }
+            )
         }
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("The inspiration edit", style = MaterialTheme.typography.titleLarge)
@@ -213,6 +245,19 @@ fun StyleScreen(studio: StudioViewModel, onChoose: () -> Unit, onOptions: () -> 
                 }
             }
         }
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("Studio variations", style = MaterialTheme.typography.labelLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(1 to "1 Master Photo", 4 to "4 Variations ✨").forEach { (count, label) ->
+                    FilterChip(
+                        selected = studio.variationsCount == count,
+                        onClick = { studio.variationsCount = count },
+                        enabled = !studio.isGenerating,
+                        label = { Text(label) }
+                    )
+                }
+            }
+        }
         if (studio.mode == "in_place") Column {
             Text("What would you like to change?", style = MaterialTheme.typography.labelLarge)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -244,7 +289,14 @@ private fun GenerationProgress(label: String, elapsed: Int) {
 }
 
 @Composable
-fun ResultScreen(creation: Creation, exporting: Boolean, onShare: () -> Unit, onAnother: () -> Unit) {
+fun ResultScreen(
+    creation: Creation,
+    exporting: Boolean,
+    studio: StudioViewModel,
+    onShare: () -> Unit,
+    onShareStory: () -> Unit,
+    onAnother: () -> Unit
+) {
     var showOriginal by rememberSaveable(creation.imageUrl) { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
         PageHeading("03 / The reveal", "Your new look.", "Same you. A whole new perspective.")
@@ -258,7 +310,53 @@ fun ResultScreen(creation: Creation, exporting: Boolean, onShare: () -> Unit, on
                 Text(if (showOriginal) "Show comparison" else "View original")
             }
         }
-        StudioOutlineButton("Share photo", onClick = onShare, icon = Icons.Default.Share, enabled = !exporting)
+
+        if (creation.variationUrls.size > 1) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Studio Variations (${creation.variationUrls.size})", style = MaterialTheme.typography.labelLarge)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    itemsIndexed(creation.variationUrls) { idx, url ->
+                        val isSelected = url == creation.imageUrl
+                        Box(
+                            modifier = Modifier
+                                .size(74.dp, 94.dp)
+                                .clip(MaterialTheme.shapes.small)
+                                .border(
+                                    if (isSelected) 2.dp else 1.dp,
+                                    if (isSelected) Color(0xFFFFB800) else MaterialTheme.colorScheme.outlineVariant,
+                                    MaterialTheme.shapes.small
+                                )
+                                .clickable { studio.selectVariation(idx) }
+                        ) {
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Variation ${idx + 1}",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            if (isSelected) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .background(Color(0xFFFFB800))
+                                        .fillMaxWidth()
+                                        .padding(vertical = 1.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Active", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            StudioOutlineButton("Share photo", onClick = onShare, icon = Icons.Default.Share, enabled = !exporting, modifier = Modifier.weight(1f))
+            StudioOutlineButton("Story (9:16)", onClick = onShareStory, icon = Icons.Default.AutoStories, enabled = !exporting, modifier = Modifier.weight(1f))
+        }
+
         TextButton(onClick = onAnother, enabled = !exporting, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Try another style")
         }

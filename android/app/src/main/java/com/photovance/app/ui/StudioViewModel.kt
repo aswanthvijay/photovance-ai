@@ -23,17 +23,35 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 import com.photovance.app.auth.AuthRepository
 import com.photovance.app.auth.PhotovanceAuthRepository
+import com.photovance.app.billing.BillingManager
+import com.photovance.app.billing.VipPlan
 import com.photovance.app.engine.HybridStudioRouter
 import com.photovance.app.engine.StudioEngineMode
 
-data class Creation(val beforeUrl: String, val imageUrl: String, val prompt: String, val elapsed: Double?,
-    val sourceImageId: String? = null, val studioUrl: String = "")
+data class Creation(
+    val beforeUrl: String,
+    val imageUrl: String,
+    val prompt: String,
+    val elapsed: Double?,
+    val sourceImageId: String? = null,
+    val studioUrl: String = "",
+    val variationUrls: List<String> = emptyList()
+)
 
 class StudioViewModel(application: Application) : AndroidViewModel(application) {
     val authRepository: AuthRepository = PhotovanceAuthRepository(application)
     val hybridRouter: HybridStudioRouter = HybridStudioRouter(application)
+    val billingManager: BillingManager = BillingManager(application)
     val currentUser = authRepository.currentUser
     val engineMode = hybridRouter.engineMode
+    val isVip = billingManager.isVip
+    val remainingCredits = billingManager.remainingCredits
+
+    var showPaywall by mutableStateOf(false)
+    var variationsCount by mutableIntStateOf(1)
+    var garmentUri by mutableStateOf<Uri?>(null)
+    private var uploadedGarmentId: String? = null
+    var activeVariationIndex by mutableIntStateOf(0)
 
     var step by mutableIntStateOf(0)
         private set
@@ -147,8 +165,49 @@ class StudioViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun setGarment(uri: Uri?) {
+        garmentUri = uri
+        uploadedGarmentId = null
+    }
+
+    fun selectVariation(index: Int) {
+        val current = result ?: return
+        if (index in current.variationUrls.indices) {
+            activeVariationIndex = index
+            result = current.copy(imageUrl = current.variationUrls[index])
+        }
+    }
+
+    fun openPaywall() {
+        showPaywall = true
+    }
+
+    fun dismissPaywall() {
+        showPaywall = false
+    }
+
+    fun subscribeVip(plan: VipPlan) {
+        billingManager.subscribe(plan)
+        showPaywall = false
+        message = "Welcome to Photovance VIP Studio!"
+    }
+
+    fun restorePurchases() {
+        val restored = billingManager.restorePurchases()
+        if (restored) {
+            showPaywall = false
+            message = "VIP Studio subscription restored!"
+        } else {
+            message = "No active subscription found."
+        }
+    }
+
     fun generate() {
         if (isGenerating || !hasPhoto) return
+        if (!billingManager.canGenerate()) {
+            showPaywall = true
+            return
+        }
         if (prompt.isBlank()) { error = "Choose a style or describe the look you'd like."; return }
         val requestedPrompt = prompt.trim()
         val requestedMode = mode
@@ -156,6 +215,7 @@ class StudioViewModel(application: Application) : AndroidViewModel(application) 
         val requestedRatio = aspectRatio
         val requestedTarget = target
         val requestedNegative = negativePrompt
+        val requestedVariations = variationsCount
         isGenerating = true
         error = null
         elapsedSeconds = 0
@@ -173,20 +233,43 @@ class StudioViewModel(application: Application) : AndroidViewModel(application) 
                     uploadedId = nextId
                     originalUrl = nextOriginal
                 }
-                progressLabel = "Creating your new look"
+
+                // Upload reference garment if present
+                if (garmentUri != null && uploadedGarmentId == null) {
+                    progressLabel = "Analyzing reference garment"
+                    val garmentUpload = uploadPortrait(getApplication(), checkNotNull(garmentUri))
+                    uploadedGarmentId = garmentUpload.imageId
+                }
+
+                progressLabel = if (requestedVariations > 1) "Generating $requestedVariations studio variations" else "Creating your new look"
                 val response = ApiClient.api.changeDress(ChangeDressRequest(
                     imageId = checkNotNull(uploadedId), prompt = requestedPrompt,
                     negativePrompt = requestedNegative, modelKey = requestedModel,
-                    mode = requestedMode, aspectRatio = requestedRatio, target = requestedTarget, keepFace = true
+                    mode = requestedMode, aspectRatio = requestedRatio, target = requestedTarget, keepFace = true,
+                    variations = requestedVariations, garmentId = uploadedGarmentId
                 ))
                 if (!response.success || response.resultUrl == null) {
                     throw IllegalStateException(response.error ?: "Couldn't create this look. Please try again.")
                 }
-                val creation = Creation(checkNotNull(originalUrl), ApiClient.getFullUrl(response.resultUrl),
-                    requestedPrompt, response.elapsed, uploadedId, ApiClient.baseUrl)
+                val variationList = if (!response.results.isNullOrEmpty()) {
+                    response.results.map { ApiClient.getFullUrl(it) }
+                } else {
+                    listOf(ApiClient.getFullUrl(response.resultUrl))
+                }
+                val creation = Creation(
+                    checkNotNull(originalUrl),
+                    variationList.first(),
+                    requestedPrompt,
+                    response.elapsed,
+                    uploadedId,
+                    ApiClient.baseUrl,
+                    variationList
+                )
+                activeVariationIndex = 0
                 result = creation
                 recent.add(0, creation)
                 if (recent.size > 20) recent.removeAt(recent.lastIndex)
+                billingManager.consumeCreditIfFree()
                 online = true
                 step = 2
             } catch (cancelled: CancellationException) { throw cancelled
@@ -216,17 +299,24 @@ class StudioViewModel(application: Application) : AndroidViewModel(application) 
 
     fun save() = export(share = false)
     fun share() = export(share = true)
+    fun shareStory() = export(share = true, asStory = true)
 
-    private fun export(share: Boolean) {
+    private fun export(share: Boolean, asStory: Boolean = false) {
         val photo = result ?: return
         if (isExporting) return
         isExporting = true
         viewModelScope.launch {
             try {
-                if (share) sharePortrait(getApplication(), photo.imageUrl)
-                else { savePortrait(getApplication(), photo.imageUrl); message = "Photo saved to your gallery" }
+                val vip = isVip.value
+                if (share) {
+                    sharePortrait(getApplication(), photo.imageUrl, isVip = vip, asStory = asStory)
+                } else {
+                    savePortrait(getApplication(), photo.imageUrl, isVip = vip)
+                    message = "Photo saved to your gallery"
+                }
             } catch (cancelled: CancellationException) { throw cancelled
-            } catch (_: Exception) { message = if (share) "Couldn't share this photo. Try again." else "Couldn't save this photo. Try again."
+            } catch (_: Exception) {
+                message = if (share) "Couldn't share this photo. Try again." else "Couldn't save this photo. Try again."
             } finally { isExporting = false }
         }
     }

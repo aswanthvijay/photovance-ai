@@ -37,7 +37,9 @@ fun StudioHeader(
     onBack: (() -> Unit)? = null,
     onExplore: (() -> Unit)? = null,
     engineModeTitle: String? = null,
-    onToggleEngine: (() -> Unit)? = null
+    onToggleEngine: (() -> Unit)? = null,
+    vipBadgeTitle: String? = null,
+    onTapVip: (() -> Unit)? = null
 ) {
     Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically) {
@@ -54,6 +56,22 @@ fun StudioHeader(
                 overflow = TextOverflow.Ellipsis)
             Text("PRO PHOTO STUDIO", style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 2.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (vipBadgeTitle != null) {
+            Surface(
+                onClick = { onTapVip?.invoke() },
+                shape = MaterialTheme.shapes.small,
+                color = androidx.compose.ui.graphics.Color(0xFFFFB800).copy(alpha = 0.15f),
+                border = BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFFFB800).copy(alpha = 0.6f))
+            ) {
+                Text(
+                    text = vipBadgeTitle,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = androidx.compose.ui.graphics.Color(0xFFFFB800),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+            Spacer(Modifier.width(6.dp))
         }
         if (engineModeTitle != null) {
             Surface(

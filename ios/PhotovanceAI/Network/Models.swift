@@ -63,6 +63,8 @@ struct ChangeDressRequest: Codable {
     let target: String
     let expand: Int
     let keepFace: Bool
+    let variations: Int?
+    let garmentId: String?
 
     enum CodingKeys: String, CodingKey {
         case imageId = "image_id"
@@ -74,6 +76,8 @@ struct ChangeDressRequest: Codable {
         case target
         case expand
         case keepFace = "keep_face"
+        case variations
+        case garmentId = "garment_id"
     }
 }
 
@@ -85,6 +89,7 @@ struct ChangeDressResponse: Codable {
     let modelName: String?
     let mode: String?
     let coverage: Double?
+    let results: [String]?
     let error: String?
 
     enum CodingKeys: String, CodingKey {
@@ -95,6 +100,7 @@ struct ChangeDressResponse: Codable {
         case modelName = "model_name"
         case mode
         case coverage
+        case results
         case error
     }
 }

@@ -10,6 +10,7 @@ struct RecentCreationItem: Identifiable {
 
 struct HomeScreenView: View {
     @StateObject private var api = ApiClient.shared
+    @ObservedObject var storeKit = StoreKitManager.shared
 
     @State private var selectedMode: String = "face_studio"
     @State private var selectedModelKey: String = "flux_klein"
@@ -20,7 +21,13 @@ struct HomeScreenView: View {
     @State private var promptText: String = "wearing a glamorous backless gold chainmail dress, standing on the teak deck of a luxury superyacht in Monaco during golden hour sunset, cinematic lighting, 8k photo"
     @State private var negativePromptText: String = ""
     @State private var showSettingsSheet: Bool = false
+    @State private var showPaywall: Bool = false
     @State private var isHoldPeekOriginal: Bool = false
+
+    @State private var variationsCount: Int = 1
+    @State private var selectedGarment: UIImage? = nil
+    @State private var variationUrls: [URL] = []
+    @State private var activeVariationIndex: Int = 0
 
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var selectedImage: UIImage? = nil
@@ -88,6 +95,20 @@ struct HomeScreenView: View {
                     Spacer()
 
                     HStack(spacing: 8) {
+                        // VIP / Free Credits Pill
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            Text(storeKit.isVIP ? "👑 VIP" : "✨ \(storeKit.remainingCredits) Free")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(Color(red: 1.0, green: 0.72, blue: 0.0))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color(red: 1.0, green: 0.72, blue: 0.0).opacity(0.15))
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Color(red: 1.0, green: 0.72, blue: 0.0).opacity(0.6), lineWidth: 1))
+                        }
+
                         // Smart Hybrid Engine Pill
                         let isNpuCapable = DeviceCapabilityDetector.shared.currentSpec.supportsLocalNpuStudio
                         Button {
@@ -149,7 +170,7 @@ struct HomeScreenView: View {
                                 selectedMode = "face_studio"
                             } label: {
                                 Text("🌟 Face Studio")
-                                    .font(.system(size: 13, weight: .bold))
+                                    .font(.system(size: 11.5, weight: .bold))
                                     .foregroundColor(selectedMode == "face_studio" ? .white : .textMuted)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
@@ -160,12 +181,24 @@ struct HomeScreenView: View {
                             Button {
                                 selectedMode = "in_place"
                             } label: {
-                                Text("👗 In-Place Swap")
-                                    .font(.system(size: 13, weight: .bold))
+                                Text("👗 Swap Outfit")
+                                    .font(.system(size: 11.5, weight: .bold))
                                     .foregroundColor(selectedMode == "in_place" ? .white : .textMuted)
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
                                     .background(selectedMode == "in_place" ? AnyShapeStyle(LinearGradient.heroGradient) : AnyShapeStyle(Color.clear))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+
+                            Button {
+                                selectedMode = "wardrobe"
+                            } label: {
+                                Text("✨ Wardrobe")
+                                    .font(.system(size: 11.5, weight: .bold))
+                                    .foregroundColor(selectedMode == "wardrobe" ? .white : .textMuted)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(selectedMode == "wardrobe" ? AnyShapeStyle(LinearGradient.heroGradient) : AnyShapeStyle(Color.clear))
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
                         }
@@ -173,6 +206,15 @@ struct HomeScreenView: View {
                         .background(Color.bgCard)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                        if selectedMode == "wardrobe" {
+                            VirtualWardrobePickerView(
+                                selectedGarment: $selectedGarment,
+                                onApplyHint: { hint in
+                                    promptText = promptText.isEmpty ? "wearing \(hint)" : "\(promptText.trimmingCharacters(in: .whitespacesAndNewlines)), wearing \(hint)"
+                                }
+                            )
+                        }
 
                         // 2. Hero Studio Canvas (Portrait Frame)
                         ZStack {
@@ -396,6 +438,40 @@ struct HomeScreenView: View {
                             }
                         }
 
+                        // Variations Selector (1 Master vs 4 Variations)
+                        HStack(spacing: 8) {
+                            Text("Studio Variations:")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.textMuted)
+
+                            Button {
+                                variationsCount = 1
+                            } label: {
+                                Text("1 Master Photo")
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundColor(variationsCount == 1 ? .white : .textMuted)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(variationsCount == 1 ? AnyShapeStyle(LinearGradient.heroGradient) : AnyShapeStyle(Color.white.opacity(0.06)))
+                                    .clipShape(Capsule())
+                            }
+
+                            Button {
+                                variationsCount = 4
+                            } label: {
+                                Text("4 Variations ✨")
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundColor(variationsCount == 4 ? .white : .textMuted)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(variationsCount == 4 ? AnyShapeStyle(LinearGradient.heroGradient) : AnyShapeStyle(Color.white.opacity(0.06)))
+                                    .clipShape(Capsule())
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 2)
+
                         // 5. Hero Generate Action Button
                         Button {
                             generateImage()
@@ -424,7 +500,7 @@ struct HomeScreenView: View {
                                             .foregroundColor(.white)
                                             .tracking(0.5)
 
-                                        Text("⚡ 4-step DiT render · ~12s with 100% Face Lock")
+                                        Text("⚡ 8K Studio Lighting · ~12s with 100% Face Lock")
                                             .font(.system(size: 10))
                                             .foregroundColor(Color(red: 252/255, green: 231/255, blue: 243/255))
                                     }
@@ -449,42 +525,101 @@ struct HomeScreenView: View {
                                 BeforeAfterSliderView(beforeUrl: bUrl, afterUrl: resUrl, isHoldPeekOriginal: isHoldPeekOriginal)
                                     .frame(height: 380)
 
+                                if variationUrls.count > 1 {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("Studio Variations (\(variationUrls.count))")
+                                            .font(.system(size: 13, weight: .bold))
+                                            .foregroundColor(.white)
+
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack(spacing: 10) {
+                                                ForEach(Array(variationUrls.enumerated()), id: \.offset) { idx, url in
+                                                    let isSelected = url == resultImageUrl
+                                                    Button(action: {
+                                                        resultImageUrl = url
+                                                        activeVariationIndex = idx
+                                                    }) {
+                                                        ZStack(alignment: .bottom) {
+                                                            AsyncImage(url: url) { img in
+                                                                img.resizable().scaledToFill()
+                                                            } placeholder: {
+                                                                Color.bgCard
+                                                            }
+                                                            .frame(width: 72, height: 92)
+                                                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(isSelected ? Color(red: 1.0, green: 0.72, blue: 0.0) : Color.white.opacity(0.15), lineWidth: isSelected ? 2 : 1)
+                                                            )
+
+                                                            if isSelected {
+                                                                Text("Active")
+                                                                    .font(.system(size: 9, weight: .bold))
+                                                                    .foregroundColor(.black)
+                                                                    .frame(maxWidth: .infinity)
+                                                                    .padding(.vertical, 2)
+                                                                    .background(Color(red: 1.0, green: 0.72, blue: 0.0))
+                                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                                 // Action Buttons
-                                HStack(spacing: 10) {
+                                HStack(spacing: 8) {
                                     Button {
                                         saveResultToPhotos()
                                     } label: {
-                                        HStack(spacing: 4) {
+                                        HStack(spacing: 3) {
                                             Image(systemName: "square.and.arrow.down")
                                             Text("Save HD")
-                                                .font(.system(size: 12, weight: .semibold))
+                                                .font(.system(size: 11.5, weight: .semibold))
                                         }
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .frame(height: 46)
+                                        .frame(height: 44)
+                                        .background(Color.white.opacity(0.12))
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    }
+
+                                    Button {
+                                        shareStoryFormat()
+                                    } label: {
+                                        HStack(spacing: 3) {
+                                            Image(systemName: "camera.macro")
+                                            Text("Story (9:16)")
+                                                .font(.system(size: 11.5, weight: .semibold))
+                                        }
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 44)
                                         .background(Color.white.opacity(0.12))
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
 
                                     ShareLink(item: resUrl) {
-                                        HStack(spacing: 4) {
+                                        HStack(spacing: 3) {
                                             Image(systemName: "square.and.arrow.up")
                                             Text("Share")
-                                                .font(.system(size: 12, weight: .semibold))
+                                                .font(.system(size: 11.5, weight: .semibold))
                                         }
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .frame(height: 46)
+                                        .frame(height: 44)
                                         .background(Color.white.opacity(0.12))
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
 
                                     // Hold to Compare Button
-                                    Text(isHoldPeekOriginal ? "Original Photo" : "Hold to Compare")
-                                        .font(.system(size: 12, weight: .bold))
+                                    Text(isHoldPeekOriginal ? "Original" : "Compare")
+                                        .font(.system(size: 11.5, weight: .bold))
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .frame(height: 46)
+                                        .frame(height: 44)
                                         .background(isHoldPeekOriginal ? Color.successGreen : Color.accentIndigo)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                         .simultaneousGesture(
@@ -541,6 +676,9 @@ struct HomeScreenView: View {
                 isBackendOnline: $isBackendOnline,
                 serverStatusMessage: $serverStatusMessage
             )
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
         }
         .task {
             checkStatus()
@@ -629,6 +767,10 @@ struct HomeScreenView: View {
             showToast("Please enter an outfit prompt or choose a style card!")
             return
         }
+        guard storeKit.canGenerate() else {
+            showPaywall = true
+            return
+        }
 
         isGenerating = true
         elapsedSeconds = 0
@@ -646,21 +788,36 @@ struct HomeScreenView: View {
 
         Task {
             do {
+                var garmentId: String? = nil
+                if let garment = selectedGarment {
+                    let garmentRes = try? await api.uploadImage(image: garment)
+                    garmentId = garmentRes?.imageId
+                }
+
                 let req = ChangeDressRequest(
                     imageId: imgId,
                     prompt: promptText,
                     negativePrompt: negativePromptText,
                     modelKey: selectedModelKey,
-                    mode: selectedMode,
+                    mode: selectedMode == "wardrobe" ? "face_studio" : selectedMode,
                     aspectRatio: selectedAspectRatio,
                     target: "dress",
                     expand: 5,
-                    keepFace: true
+                    keepFace: true,
+                    variations: variationsCount,
+                    garmentId: garmentId
                 )
                 let res = try await api.changeDress(request: req)
                 if res.success, let resUrlStr = res.resultUrl, let fullUrl = api.getFullUrl(resUrlStr) {
-                    resultImageUrl = fullUrl
-                    recentCreations.insert(RecentCreationItem(imageUrl: fullUrl, prompt: promptText, elapsed: res.elapsed ?? 0.0), at: 0)
+                    if let results = res.results, !results.isEmpty {
+                        variationUrls = results.compactMap { api.getFullUrl($0) }
+                    } else {
+                        variationUrls = [fullUrl]
+                    }
+                    resultImageUrl = variationUrls.first ?? fullUrl
+                    activeVariationIndex = 0
+                    recentCreations.insert(RecentCreationItem(imageUrl: resultImageUrl!, prompt: promptText, elapsed: res.elapsed ?? 0.0), at: 0)
+                    _ = storeKit.consumeCreditIfFree()
                     showToast("✨ Generated in \(String(format: "%.1f", res.elapsed ?? 0))s!")
                 } else {
                     showToast(res.error ?? "Generation failed")
@@ -678,12 +835,89 @@ struct HomeScreenView: View {
         Task {
             do {
                 let (data, _) = try await URLSession.shared.data(from: url)
-                if let image = UIImage(data: data) {
-                    UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-                    showToast("Saved to Photos!")
+                if let rawImage = UIImage(data: data) {
+                    let finalImage = applyWatermarkIfFree(rawImage)
+                    UIImageWriteToSavedPhotosAlbum(finalImage, nil, nil, nil)
+                    showToast(storeKit.isVIP ? "Saved pristine 8K photo!" : "Saved to Photos (✦ Photovance)!")
                 }
             } catch {
                 showToast("Failed to save image")
+            }
+        }
+    }
+
+    private func shareStoryFormat() {
+        guard let url = resultImageUrl else { return }
+        Task {
+            do {
+                let (data, _) = try await URLSession.shared.data(from: url)
+                if let rawImage = UIImage(data: data) {
+                    let storyImage = createStoryImage(from: rawImage)
+                    UIImageWriteToSavedPhotosAlbum(storyImage, nil, nil, nil)
+                    showToast("Story format (9:16) saved to Photos!")
+                }
+            } catch {
+                showToast("Failed to prepare Story format")
+            }
+        }
+    }
+
+    private func applyWatermarkIfFree(_ image: UIImage) -> UIImage {
+        if storeKit.isVIP { return image }
+        let renderer = UIGraphicsImageRenderer(size: image.size)
+        return renderer.image { _ in
+            image.draw(at: .zero)
+            let text = "✦ PHOTOVANCE STUDIO"
+            let fontSize = max(24, image.size.width * 0.028)
+            let attrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: fontSize),
+                .foregroundColor: UIColor.white.withAlphaComponent(0.85)
+            ]
+            let str = NSAttributedString(string: text, attributes: attrs)
+            let size = str.size()
+            let margin = max(24, image.size.width * 0.04)
+            let point = CGPoint(x: image.size.width - size.width - margin, y: image.size.height - size.height - margin)
+            str.draw(at: point)
+        }
+    }
+
+    private func createStoryImage(from source: UIImage) -> UIImage {
+        let targetSize = CGSize(width: 1080, height: 1920)
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        return renderer.image { ctx in
+            let colors = [
+                UIColor(red: 0.06, green: 0.05, blue: 0.08, alpha: 1.0).cgColor,
+                UIColor(red: 0.11, green: 0.08, blue: 0.16, alpha: 1.0).cgColor
+            ]
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: [0.0, 1.0])!
+            ctx.cgContext.drawLinearGradient(gradient, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 0, y: targetSize.height), options: [])
+
+            let scale = min((targetSize.width - 96) / source.size.width, (targetSize.height - 260) / source.size.height)
+            let scaledW = source.size.width * scale
+            let scaledH = source.size.height * scale
+            let x = (targetSize.width - scaledW) / 2
+            let y = (targetSize.height - scaledH) / 2
+            source.draw(in: CGRect(x: x, y: y, width: scaledW, height: scaledH))
+
+            let title = "PHOTOVANCE AI STUDIO"
+            let titleAttrs: [NSAttributedString.Key: Any] = [
+                .font: UIFont.boldSystemFont(ofSize: 32),
+                .foregroundColor: UIColor(red: 1.0, green: 0.72, blue: 0.0, alpha: 1.0)
+            ]
+            let titleStr = NSAttributedString(string: title, attributes: titleAttrs)
+            let titleSize = titleStr.size()
+            titleStr.draw(at: CGPoint(x: (targetSize.width - titleSize.width) / 2, y: 110))
+
+            if !storeKit.isVIP {
+                let watermark = "✦ PHOTOVANCE STUDIO"
+                let wmAttrs: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.boldSystemFont(ofSize: 28),
+                    .foregroundColor: UIColor.white.withAlphaComponent(0.85)
+                ]
+                let wmStr = NSAttributedString(string: watermark, attributes: wmAttrs)
+                let wmSize = wmStr.size()
+                wmStr.draw(at: CGPoint(x: targetSize.width - wmSize.width - 48, y: targetSize.height - 48))
             }
         }
     }

@@ -36,7 +36,9 @@ data class ChangeDressRequest(
     @SerializedName("aspect_ratio") val aspectRatio: String = "portrait",
     @SerializedName("target") val target: String = "dress",
     @SerializedName("expand") val expand: Int = 5,
-    @SerializedName("keep_face") val keepFace: Boolean = true
+    @SerializedName("keep_face") val keepFace: Boolean = true,
+    @SerializedName("variations") val variations: Int = 1,
+    @SerializedName("garment_id") val garmentId: String? = null
 )
 
 data class ChangeDressResponse(
@@ -47,6 +49,7 @@ data class ChangeDressResponse(
     @SerializedName("model_name") val modelName: String?,
     @SerializedName("mode") val mode: String?,
     @SerializedName("coverage") val coverage: Double?,
+    @SerializedName("results") val results: List<String>? = null,
     @SerializedName("error") val error: String?
 )
 

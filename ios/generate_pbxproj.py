@@ -18,6 +18,9 @@ files = [
     ('KeychainVault.swift', 'Security/KeychainVault.swift', 'source'),
     ('AuthManager.swift', 'Network/AuthManager.swift', 'source'),
     ('AuthView.swift', 'Views/AuthView.swift', 'source'),
+    ('StoreKitManager.swift', 'Billing/StoreKitManager.swift', 'source'),
+    ('PaywallView.swift', 'Views/PaywallView.swift', 'source'),
+    ('VirtualWardrobePickerView.swift', 'Views/VirtualWardrobePickerView.swift', 'source'),
     ('Assets.xcassets', 'Assets.xcassets', 'resource')
 ]
 
